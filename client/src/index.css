@@ -1,0 +1,104 @@
+/* ───────────────────────────────────────────────────────────
+   Tailwind CSS v4
+   ─────────────────────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ───────────────────────────────────────────────────────────
+   Google Fonts — Inter
+   ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ───────────────────────────────────────────────────────────
+   Base Layer Overrides
+   ─────────────────────────────────────────────────────────── */
+@layer base {
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply m-0 bg-gray-950 text-gray-100 min-h-screen;
+  }
+
+  a {
+    @apply text-green-400 hover:text-green-300 transition-colors duration-200 no-underline;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  button {
+    @apply cursor-pointer font-medium transition-all duration-200;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Utility Components
+   ─────────────────────────────────────────────────────────── */
+@layer components {
+  .btn-primary {
+    @apply bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-950;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-100 font-semibold py-2.5 px-5 rounded-xl border border-gray-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-950;
+  }
+
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-2xl shadow-lg p-5;
+  }
+
+  .input-field {
+    @apply w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+  }
+
+  .badge-error {
+    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+}
