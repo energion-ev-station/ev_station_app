@@ -1,104 +1,167 @@
-/* ───────────────────────────────────────────────────────────
-   Tailwind CSS v4
-   ─────────────────────────────────────────────────────────── */
-@import "tailwindcss";
-
-/* ───────────────────────────────────────────────────────────
-   Google Fonts — Inter
-   ─────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* ───────────────────────────────────────────────────────────
-   Base Layer Overrides
-   ─────────────────────────────────────────────────────────── */
-@layer base {
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  html {
-    scroll-behavior: smooth;
-    font-family: 'Inter', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    @apply m-0 bg-gray-950 text-gray-100 min-h-screen;
-  }
-
-  a {
-    @apply text-green-400 hover:text-green-300 transition-colors duration-200 no-underline;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-semibold tracking-tight;
-  }
-
-  button {
-    @apply cursor-pointer font-medium transition-all duration-200;
-  }
-
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-600 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
-  }
+/* Swift Charge — Dark Hacker/Dev Aesthetic */
+:root {
+  --bg-page: #0a0a0a;
+  --bg-card: #111111;
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-subtle: #1a1a1a;
+  --accent-primary: #ff6b6b;
+  --accent-secondary: #4ecca3;
+  --accent-warning: #f5a623;
+  --text-body: #cccccc;
+  --text-heading: #ffffff;
+  --text-muted: #8a8a8a;
+  --radius-card: 14px;
+  --radius-pill: 999px;
 }
 
-/* ───────────────────────────────────────────────────────────
-   Utility Components
-   ─────────────────────────────────────────────────────────── */
-@layer components {
-  .btn-primary {
-    @apply bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-950;
-  }
+* {
+  box-sizing: border-box;
+}
 
-  .btn-secondary {
-    @apply bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-100 font-semibold py-2.5 px-5 rounded-xl border border-gray-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-950;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-page);
+  color: var(--text-body);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
 
-  .card {
-    @apply bg-gray-900 border border-gray-800 rounded-2xl shadow-lg p-5;
-  }
+#root {
+  min-height: 100vh;
+}
 
-  .input-field {
-    @apply w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200;
-  }
+/* Layout */
+.app-layout {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
 
-  .badge {
-    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full;
-  }
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
 
-  .badge-success {
-    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30;
-  }
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 1.5rem 2rem;
+}
 
-  .badge-warning {
-    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
-  }
+/* Status Badges */
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
 
-  .badge-error {
-    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30;
-  }
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.badge-available::before { background: var(--accent-secondary); }
+.badge-busy::before { background: var(--accent-primary); }
+.badge-live::before {
+  background: var(--accent-secondary);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent-secondary);
+  color: #0a0a0a;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-warning {
+  background: var(--accent-warning);
+  color: #0a0a0a;
+}
+
+.btn-danger {
+  background: var(--accent-primary);
+  color: #ffffff;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-body);
+  border: 1px solid var(--border-card);
+}
+
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--text-muted);
+}
+
+/* Inputs */
+input, select, textarea {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-heading);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-secondary);
+}
+
+/* Links */
+a {
+  color: var(--accent-secondary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }

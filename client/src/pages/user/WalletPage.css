@@ -1,0 +1,164 @@
+.wallet-container {
+  min-height: calc(100vh - 100px);
+  background: var(--bg-page);
+  padding: 2rem 1.5rem;
+}
+
+.wallet-header {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.btn-back {
+  background: transparent;
+  border: 1px solid var(--border-card);
+  color: var(--text-body);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  border-color: var(--text-muted);
+  color: var(--text-heading);
+}
+
+.wallet-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+.wallet-content {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.balance-card-featured {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  text-align: center;
+}
+
+.balance-card-featured .balance-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.balance-card-featured .balance-amount {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--accent-secondary);
+}
+
+.transactions-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+}
+
+.transactions-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0 0 1.5rem 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 12px;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-card);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.tx-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tx-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.tx-icon.recharge {
+  background: rgba(78, 204, 163, 0.15);
+}
+
+.tx-icon.charge {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.tx-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tx-type {
+  font-weight: 600;
+  color: var(--text-heading);
+  font-size: 0.95rem;
+}
+
+.tx-date {
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+  margin: 0 !important;
+}
+
+.tx-amount {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.tx-amount.recharge {
+  color: var(--accent-secondary);
+}
+
+.tx-amount.charge {
+  color: var(--accent-primary);
+}
