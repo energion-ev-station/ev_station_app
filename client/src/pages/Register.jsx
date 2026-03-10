@@ -36,7 +36,7 @@ export default function Register() {
     return (
         <div style={styles.page}>
             <div style={styles.card}>
-                <h2 style={styles.title}>Swift Charge <span style={styles.titleAccent}>⚡</span></h2>
+                <h2 style={styles.title}>Energion <span style={styles.titleAccent}>⚡</span></h2>
                 <p style={styles.subtitle}>Create your account</p>
 
                 <form onSubmit={handleSubmit} style={styles.form}>

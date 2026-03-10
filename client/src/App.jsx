@@ -59,7 +59,7 @@ function AppContent() {
 
   return (
     <div className="app-wrapper">
-      <div className="announcement-banner">⚡ Swift Charge — EV Charging Platform</div>
+      <div className="announcement-banner">⚡ Energion — EV Charging Platform</div>
       {!hideNavbar && <Navbar />}
       <Routes>
         {/* Public */}

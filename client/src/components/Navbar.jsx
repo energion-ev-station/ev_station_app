@@ -23,7 +23,7 @@ export default function Navbar() {
     return (
         <nav className="navbar">
             <Link to="/" className="nav-brand">
-                Swift Charge <span>⚡</span>
+                Energion <span>⚡</span>
             </Link>
 
             <div className="nav-right">
