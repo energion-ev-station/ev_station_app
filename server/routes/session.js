@@ -31,14 +31,16 @@ router.post('/start', protect, async (req, res) => {
             return res.status(400).json({ message: 'Station is busy.' });
         }
 
-        // 3. Fetch current pricing and plug status from global config
+        // 3. Fetch current pricing from global config
         const config = await StationConfig.getConfig();
         const pricePerUnit = config.pricePerUnit;
 
-        // DEVELOPMENT BYPASS: Assume plug is always connected
-        // if (!config.isPluggedIn) {
-        //     return res.status(400).json({ message: 'Plug is not connected to the scooter. Please connect first.' });
-        // }
+        const { plugStatuses } = require('../services/mqttService');
+        const isPluggedIn = plugStatuses.get(stationId) || false;
+
+        if (!isPluggedIn) {
+            return res.status(400).json({ message: 'Plug is not connected to the scooter. Please connect first.' });
+        }
 
         // 4. Verify minimum wallet balance
         const user = await User.findById(userId).select('walletBalance');
@@ -94,7 +96,7 @@ router.post('/stop', protect, async (req, res) => {
 
         // 2. Trigger the shutdown (which locks the station, bills the user, and emits to Socket.IO)
         const io = getIo();
-        await endSession(session._id, io);
+        await endSession(session._id, io, 'Stopped by user');
 
         res.json({ message: 'Stop command issued successfully' });
     } catch (err) {

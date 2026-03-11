@@ -96,5 +96,32 @@ const io = new Server(server, {
 // Pass the io instance to our handler
 initSocket(io);
 
+// ─── Requirement 5 Safety Background Job ─────────────────────────────────────
+// Run every 5 minutes: End any active session that is older than 2 hours.
+const Session = require('./models/Session');
+const { endSession } = require('./services/billingService');
+
+setInterval(async () => {
+    try {
+        const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+        
+        // Find all active sessions started more than 2 hours ago
+        const staleSessions = await Session.find({
+            status: 'active',
+            startTime: { $lt: twoHoursAgo }
+        });
+
+        if (staleSessions.length > 0) {
+            console.log(`[SafetyJob] Found ${staleSessions.length} stale active sessions older than 2 hours. Terminating...`);
+            for (const session of staleSessions) {
+                // Ensure io is passed to correctly notify connected clients via socket
+                await endSession(session._id, io);
+            }
+        }
+    } catch (err) {
+        console.error('[SafetyJob] Error cleaning up stale sessions:', err);
+    }
+}, 5 * 60 * 1000); // 5 minutes
+
 // Start server
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

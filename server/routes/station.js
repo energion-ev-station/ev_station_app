@@ -27,9 +27,12 @@ router.get('/', protect, async (req, res, next) => {
         // Build a Set of busy station IDs for O(1) lookup
         const busyIds = new Set(activeSessions.map((s) => s.stationId));
 
+        const { plugStatuses } = require('../services/mqttService');
+        
         const stations = STATIONS.map((station) => ({
             ...station,
             status: busyIds.has(station.id) ? 'busy' : 'available',
+            isPluggedIn: plugStatuses.get(station.id) || false
         }));
 
         res.json({ stations });

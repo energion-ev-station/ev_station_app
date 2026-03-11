@@ -8,7 +8,7 @@ const Transaction = require('../models/Transaction');
  * Ends a charging session, calculates final billing, updates the DB,
  * and notifies the station via MQTT and the client via Socket.IO
  */
-const endSession = async (sessionId, io) => {
+const endSession = async (sessionId, io, reason = 'Stopped by system') => {
     try {
         const session = await Session.findOne({ _id: sessionId, status: 'active' });
         if (!session) return; // Already completed or not found
@@ -16,6 +16,12 @@ const endSession = async (sessionId, io) => {
         // 1. Mark session as completed
         session.status = 'completed';
         session.endTime = Date.now();
+        
+        // Add reason tracking (Req 6)
+        if (!session.reasonEnded) {
+            session.set('reasonEnded', reason, { strict: false });
+        }
+        
         await session.save();
 
         // 2. Create a transaction record for the total amount deducted
@@ -38,6 +44,9 @@ const endSession = async (sessionId, io) => {
             finalBalance,
             totalEnergy: session.energyConsumed,
             totalCost: session.amountDeducted,
+            reasonEnded: reason,
+            startTime: session.startTime,
+            endTime: session.endTime
         });
 
         // 5. Ensure the hardware relay is turned off
@@ -125,8 +134,12 @@ const processMqttData = async (stationId, data, io) => {
             // Publish STOP command to the physical station
             publishCommand(stationId, 'STOP');
 
+            let reason = 'Stopped by system';
+            if (finalWalletBalance <= 0) reason = 'Wallet empty';
+            else if (updatedSession.energyConsumed >= session.maxEnergyLimit) reason = 'Energy limit reached';
+
             // Trigger the session end teardown
-            await endSession(sessionId, io);
+            await endSession(sessionId, io, reason);
         }
 
     } catch (err) {

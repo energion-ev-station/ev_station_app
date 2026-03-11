@@ -11,6 +11,11 @@ const mqttClient = mqtt.connect(brokerUrl, options);
 
 mqttClient.on('connect', () => {
     console.log('MQTT Connected to HiveMQ Cloud');
+    // Globally subscribe to all station topics to ensure we catch plug events when idle
+    mqttClient.subscribe(['station/+/data', 'station/+/status'], { qos: 1 }, (err) => {
+        if (err) console.error('Global subscribe error:', err);
+        else console.log('Subscribed globally to station/+/data and station/+/status');
+    });
 });
 
 mqttClient.on('error', (error) => {
@@ -20,6 +25,9 @@ mqttClient.on('error', (error) => {
 mqttClient.on('reconnect', () => {
     console.log('MQTT Reconnecting...');
 });
+
+// In-memory store for real-time plug status tracking (Requirement 8)
+const plugStatuses = new Map();
 
 /**
  * Publishes a command to a specific station's control topic
@@ -85,7 +93,6 @@ mqttClient.on('message', async (topic, message) => {
 
         // We require billingService and models lazily inside the handler to prevent circular dependency issues
         const { processMqttData, endSession } = require('./billingService');
-        const StationConfig = require('../models/StationConfig');
 
         if (messageType === 'data') {
             await processMqttData(stationId, payload, io);
@@ -93,17 +100,27 @@ mqttClient.on('message', async (topic, message) => {
             if (payload.event === 'unplugged') {
                 console.log(`[MQTT] Station ${stationId} unplugged.`);
 
-                // Update global config
-                await StationConfig.updateOne({ key: 'global' }, { isPluggedIn: false });
+                // Update server memory
+                plugStatuses.set(stationId, false);
+                
+                // Emit via Socket.io to all connected clients (Requirement 8)
+                io.emit('plug:status', { stationId, isPluggedIn: false });
+                console.log(`[Socket.io] Emitted plug:status = false for ${stationId}`);
 
                 // Terminate session if active
                 if (payload.sessionId) {
                     console.log(`[MQTT] Ending active session ${payload.sessionId}.`);
-                    await endSession(payload.sessionId, io);
+                    await endSession(payload.sessionId, io, 'Unplugged');
                 }
             } else if (payload.event === 'plugged') {
                 console.log(`[MQTT] Station ${stationId} plugged in.`);
-                await StationConfig.updateOne({ key: 'global' }, { isPluggedIn: true });
+                
+                // Update server memory
+                plugStatuses.set(stationId, true);
+                
+                // Emit via Socket.io to all connected clients (Requirement 8)
+                io.emit('plug:status', { stationId, isPluggedIn: true });
+                console.log(`[Socket.io] Emitted plug:status = true for ${stationId}`);
             }
         }
     } catch (err) {
@@ -116,4 +133,5 @@ module.exports = {
     mqttClient,
     publishCommand,
     subscribeToStation,
+    plugStatuses
 };
