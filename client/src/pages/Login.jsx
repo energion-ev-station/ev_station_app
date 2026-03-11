@@ -48,7 +48,7 @@ export default function Login() {
         <div style={styles.page}>
             <div style={styles.card}>
                 <h2 style={styles.title}>Energion <span style={styles.titleAccent}>⚡</span></h2>
-                <p style={styles.subtitle}>Sign in to your account</p>
+                <p style={styles.subtitle}>Sign  to your account</p>
 
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <label style={styles.label}>Email</label>
