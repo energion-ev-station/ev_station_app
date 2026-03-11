@@ -108,7 +108,7 @@ const styles = {
     },
     title: { margin: 0, fontSize: '1.75rem', textAlign: 'center', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 },
     titleAccent: { color: '#4ecca3' },
-    subtitle: { textAlign: 'center', color: '#cccccc', marginTop: '6px', marginBottom: '1.75rem', fontSize: '0.95rem' },
+    subtitle: { textAlign: 'center', color: '#cccccc', marginTop: '6px', marginBottom: '1.75rem', fontSize: '0.85rem' },
     form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
     label: { fontWeight: 600, fontSize: '0.8rem', color: '#cccccc', textTransform: 'uppercase', letterSpacing: '0.05em' },
     input: {
