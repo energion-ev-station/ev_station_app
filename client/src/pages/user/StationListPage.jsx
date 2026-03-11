@@ -10,7 +10,6 @@ export default function StationListPage() {
     const navigate = useNavigate();
     const { token } = useAuth();
     const [stations, setStations] = useState([]);
-    const [plugStatuses, setPlugStatuses] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -20,16 +19,7 @@ export default function StationListPage() {
                 const response = await api.get('/stations');
                 const fetchedStations = response.data.stations || [];
                 setStations(fetchedStations);
-                
-                // Initialize plug statuses based on API
-                const initialStatuses = {};
-                fetchedStations.forEach(s => {
-                    const sId = s.id || s._id;
-                    if (s.isPluggedIn !== undefined) {
-                        initialStatuses[sId] = s.isPluggedIn;
-                    }
-                });
-                setPlugStatuses(initialStatuses);
+                setStations(fetchedStations);
             } catch (err) {
                 console.error('Failed to fetch stations:', err);
                 setError('Failed to load stations. Please try again later.');
@@ -41,31 +31,7 @@ export default function StationListPage() {
         fetchStations();
     }, []);
 
-    // Listen for live plug status updates from the server
-    useEffect(() => {
-        if (!token) return;
 
-        const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
-        const socket = io(socketUrl, { transports: ['websocket'] });
-
-        socket.on('connect', () => {
-            // Join user room just like the charging dashboard
-            socket.emit('join', { token });
-        });
-
-        socket.on('plug:status', (data) => {
-            if (data && data.stationId) {
-                setPlugStatuses(prev => ({
-                    ...prev,
-                    [data.stationId]: data.isPluggedIn
-                }));
-            }
-        });
-
-        return () => {
-            socket.disconnect();
-        };
-    }, [token]);
 
     const handleStationClick = (station) => {
         if (station.name === 'Station 02' || station.status !== 'available') {
@@ -106,8 +72,6 @@ export default function StationListPage() {
                     {stations.length > 0 && (() => {
                         const s1 = stations[0];
                         const s1Id = s1.id || s1._id;
-                        const isPlugged = plugStatuses[s1Id] || false;
-                        
                         return (
                             <div
                                 key={s1Id}
@@ -117,11 +81,6 @@ export default function StationListPage() {
                                 <div className="station-header" style={{ marginBottom: 0 }}>
                                     <div>
                                         <h3 className="station-name" style={{ margin: 0 }}>Station 01</h3>
-                                        {/* Requirement 1: Live plug indicator */}
-                                        <div style={{ marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: isPlugged ? '#10b981' : 'var(--text-muted)', fontWeight: 500 }}>
-                                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isPlugged ? '#10b981' : 'var(--text-muted)' }}></span>
-                                            {isPlugged ? 'Plugged In' : 'Not Plugged In'}
-                                        </div>
                                     </div>
                                     <span className={`status-badge available`}>
                                         Available
@@ -140,10 +99,6 @@ export default function StationListPage() {
                         <div className="station-header" style={{ marginBottom: 0 }}>
                             <div>
                                 <h3 className="station-name" style={{ margin: 0 }}>Station 02</h3>
-                                <div style={{ marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: plugStatuses['hardcoded-station-02'] ? '#10b981' : 'var(--text-muted)', fontWeight: 500 }}>
-                                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: plugStatuses['hardcoded-station-02'] ? '#10b981' : 'var(--text-muted)' }}></span>
-                                    {plugStatuses['hardcoded-station-02'] ? 'Plugged In' : 'Not Plugged In'}
-                                </div>
                             </div>
                             <span className="status-badge busy">
                                 Not Available

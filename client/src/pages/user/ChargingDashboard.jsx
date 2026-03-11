@@ -16,7 +16,6 @@ export default function ChargingDashboard() {
 
     // Data state
     const [stationName, setStationName] = useState('Loading Station...');
-    const [isPluggedIn, setIsPluggedIn] = useState(false);
     const [initialBalance, setInitialBalance] = useState(0);
     const [pricePerUnit, setPricePerUnit] = useState(15);
     const [minBalanceRequirement, setMinBalanceRequirement] = useState(10);
@@ -60,7 +59,6 @@ export default function ChargingDashboard() {
                 const stations = stationsRes.data.stations || [];
                 const currentStation = stations.find(s => s._id === stationId || s.id === stationId);
                 setStationName(currentStation ? currentStation.name : stationId);
-                setIsPluggedIn(currentStation ? currentStation.isPluggedIn : false);
 
                 // c. Is station busy (another user)?
                 if (currentStation && currentStation.status === 'busy') {
@@ -172,12 +170,7 @@ export default function ChargingDashboard() {
             }
         });
 
-        // Listen for plug status updates
-        socket.on('plug:status', (data) => {
-            if (data.stationId === stationId) {
-                setIsPluggedIn(data.isPluggedIn);
-            }
-        });
+
 
         // Handle session auto-terminate or explicit end from backend
         socket.on('session:ended', (data) => {
@@ -326,10 +319,9 @@ export default function ChargingDashboard() {
                         <h2 className="station-title">{stationName}</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', marginBottom: '1rem' }}>
                             <p className="station-subtitle" style={{ margin: 0 }}>Station ID: {stationId}</p>
-                            {/* Requirement 2d: Show plug status live in charging card */}
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', backgroundColor: isPluggedIn ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)', color: isPluggedIn ? '#10b981' : '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isPluggedIn ? '#10b981' : '#64748b' }}></span>
-                                {isPluggedIn ? 'Plugged In' : 'Not Plugged In'}
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontSize: '0.85rem', fontWeight: 600 }}>
+                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
+                                Station Available
                             </div>
                         </div>
                     </div>
@@ -355,16 +347,12 @@ export default function ChargingDashboard() {
                                     </p>
                                 </div>
 
-                                {/* Requirement 3a & 3b: If not plugged in show warning, if plugged in show button */}
-                                {!isPluggedIn ? (
-                                    <div className="warning-card">
-                                        ⚠️ Please plug in your EV to the station first.
-                                    </div>
-                                ) : (
-                                    <button className="action-btn btn-green" onClick={handleStartChargingUI}>
-                                        ⚡ Start Charging
-                                    </button>
-                                )}
+                                <button className="action-btn btn-green" onClick={handleStartChargingUI}>
+                                    ⚡ Start Charging
+                                </button>
+                                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '1rem', textAlign: 'center' }}>
+                                    Please plug in your EV within 60 seconds of starting.
+                                </p>
                             </div>
                         ) : (
                             <>
@@ -385,11 +373,18 @@ export default function ChargingDashboard() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                                 <h2 className="station-title" style={{ margin: 0, textAlign: 'left' }}>{stationName}</h2>
-                                {/* Requirement 4: Live plug status indicator */}
-                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 8px', borderRadius: '12px', backgroundColor: isPluggedIn ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)', color: isPluggedIn ? '#10b981' : '#64748b', fontSize: '0.75rem', fontWeight: 600 }}>
-                                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: isPluggedIn ? '#10b981' : '#64748b' }}></span>
-                                    {isPluggedIn ? 'Plugged In' : 'Not Plugged In'}
-                                </div>
+                                {/* Virtual Energy Flow indicator */}
+                                {current > 0.1 ? (
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 8px', borderRadius: '12px', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontSize: '0.75rem', fontWeight: 600 }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
+                                        Power Flowing
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 8px', borderRadius: '12px', backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontSize: '0.75rem', fontWeight: 600 }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#f59e0b', animation: 'pulse 1.5s infinite' }}></span>
+                                        Waiting for EV...
+                                    </div>
+                                )}
                             </div>
                             <div className="pulse-indicator" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-secondary)', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                                 <span className="badge badge-live" style={{ width: '8px', height: '8px', background: 'var(--accent-secondary)', borderRadius: '50%', animation: 'pulse 1.5s infinite' }}></span>

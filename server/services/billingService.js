@@ -4,6 +4,9 @@ const { publishCommand } = require('./mqttService');
 
 const Transaction = require('../models/Transaction');
 
+// Track consecutive zero-current readings per station to infer unplug events
+const zeroCurrentTicks = new Map();
+
 /**
  * Ends a charging session, calculates final billing, updates the DB,
  * and notifies the station via MQTT and the client via Socket.IO
@@ -74,6 +77,27 @@ const processMqttData = async (stationId, data, io) => {
         if (!session) {
             // No active session found for this ID (maybe it already finished or was canceled)
             return;
+        }
+
+        // Virtual Plug Detection: Infer physical disconnection if current <= 0.1A for 3 contiguous readings (15s)
+        if (current <= 0.1) {
+            const ticks = (zeroCurrentTicks.get(stationId) || 0) + 1;
+            zeroCurrentTicks.set(stationId, ticks);
+            
+            if (ticks >= 3) {
+                console.log(`[BillingService] Session ${sessionId} auto-ended due to 0A current (Virtual Unplug).`);
+                
+                // Publish STOP command to the physical station
+                publishCommand(stationId, 'STOP');
+                
+                // Trigger the session end teardown
+                await endSession(sessionId, io, 'Charging completed or vehicle unplugged');
+                zeroCurrentTicks.delete(stationId);
+                return;
+            }
+        } else {
+            // Power is flowing, reset tick counter
+            zeroCurrentTicks.set(stationId, 0);
         }
 
         // 2. Calculate the incremental energy and cost since the LAST telemetry update

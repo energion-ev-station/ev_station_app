@@ -35,13 +35,6 @@ router.post('/start', protect, async (req, res) => {
         const config = await StationConfig.getConfig();
         const pricePerUnit = config.pricePerUnit;
 
-        const { plugStatuses } = require('../services/mqttService');
-        const isPluggedIn = plugStatuses.get(stationId) || false;
-
-        if (!isPluggedIn) {
-            return res.status(400).json({ message: 'Plug is not connected to the scooter. Please connect first.' });
-        }
-
         // 4. Verify minimum wallet balance
         const user = await User.findById(userId).select('walletBalance');
         if (user.walletBalance < MINIMUM_WALLET_BALANCE) {
@@ -70,6 +63,22 @@ router.post('/start', protect, async (req, res) => {
             sessionId: session._id,
             maxEnergyLimit
         });
+
+        // 9. Start 60-second grace period timer (Virtual Plug Detection)
+        setTimeout(async () => {
+            try {
+                const checkSession = await Session.findById(session._id);
+                // If after 60s the session is still active but hasn't drawn any meaningful energy, cancel it
+                if (checkSession && checkSession.status === 'active' && checkSession.energyConsumed === 0) {
+                    console.log(`[Session] Auto-cancelling session ${session._id} due to 60s grace period timeout (0 energy drawn).`);
+                    
+                    publishCommand(stationId, 'STOP');
+                    await endSession(session._id, getIo(), 'Timeout - No vehicle detected');
+                }
+            } catch (err) {
+                console.error('[Session] Grace period check error:', err);
+            }
+        }, 60000);
 
         res.status(201).json({
             message: 'Charging session started successfully',
