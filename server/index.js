@@ -36,18 +36,8 @@ app.use('/api/stations', require('./routes/station'));
 app.use('/api/session', require('./routes/session'));
 app.use('/api/admin', require('./routes/admin'));
 
-const path = require('path');
-
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
-});
-
-// Serve static React build
-app.use(express.static(path.join(__dirname, '../client/dist')));
-
-// All non-API routes go to React app
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
